@@ -21,6 +21,7 @@ from confession.views import PostViewSet, PostCommentViewSet, LikeNumViewSet, Li
 from search.views import SearchRecordView, HotRankViewSet, UserSearchRecordViewSet
 from lost.views import FiveTaskViewSet
 from utils.views import GetSelfGrade, AuthStudent
+from notification.views import NotifyView
 
 router = DefaultRouter()
 # 新闻列表
@@ -62,6 +63,8 @@ urlpatterns = [
     path('grade/', GetSelfGrade.as_view()),
     # 教务系统认证接口
     path('is_stu/', AuthStudent.as_view()),
+    # 消息列表 post
+    path('msg/', NotifyView.as_view()),
 
     # 图片文件存储地址
     re_path(r'^media/(?P<path>.*)$', serve, {"document_root": MEDIA_ROOT}),

@@ -3,22 +3,47 @@ from rest_framework.views import APIView
 from .serializers import FiveTaskSerializers
 from rest_framework.response import Response
 from rest_framework import status
+from miniProgram.settings import APP_ID, APP_KEY
+from django.contrib.auth import get_user_model
+
+import requests
+import json
+User = get_user_model()
 
 
-class FiveTaskViewSet(APIView):
+class FiveTaskViewSet(APIView):   
     def get(self, request, category):
-        ft = FiveTaskModel.objects.filter(category=category)
+        ft = FiveTaskModel.objects.filter(category=category).order_by('-pub_time')
         serializer = FiveTaskSerializers(ft, many=True)
         return Response(serializer.data)
 
     def post(self, request):
+        url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}'.format(APP_ID, APP_KEY)
+        r = requests.get(url).text
+        access_token = json.loads(r)['access_token']
+        check_url = 'http://api.weixin.qq.com/wxa/servicemarket?access_token={}'.format(access_token)
+
         user_id = request.data['user_id']
         category = request.data['category']
-        title = request.data['title']
-        addr = request.data['addr']
-        name = request.data['name']
-        telephone = request.data['telephone']
+        title = str(request.data['title'])
+        addr = str(request.data['addr'])
+        name = str(request.data['name'])
+        telephone = str(request.data['telephone'])
         desc = request.data['desc']
+        TEXT = str(title + addr + name + desc)
+        check_text = {
+            "service": "wxee446d7507c68b11",
+            "api": "msgSecCheck",
+            "client_msg_id": "client_msg_id_1",
+            "data": {
+                "Action": "TextApproval",
+                "Text": TEXT
+            }
+        }
+        check_req = requests.post(check_url, json.dumps(check_text))
+        err_text = json.loads(json.loads(check_req.text)['data'])['Response']['EvilTokens']
+        if len(err_text):
+            return Response({"msg": "您的内容包含敏感词汇，请重新输入!"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             img = request.data['img']
         except:
@@ -43,3 +68,27 @@ class FiveTaskViewSet(APIView):
             if_ft.delete()
             return Response({"msg": "删除成功!"}, status=status.HTTP_204_NO_CONTENT)
         return Response({"msg": "该贴已被删除!"}, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request):
+        fivetask_id = request.data['fivetask_id']
+        category = request.data['category']
+        user_id = request.data['user_id']
+        # 一起运动
+        if category == 'run':
+            if_ft = FiveTaskModel.objects.get(id=fivetask_id)
+            if_existed_join_user = if_ft.join_users.filter(id=user_id)
+            user = User.objects.get(id=user_id)
+            if not if_existed_join_user:
+                if_ft.join_users.add(user)
+                if_ft.isMe = True
+                if_ft.nums += 1
+            else:
+                if_ft.join_users.remove(user)
+                if_ft.nums -= 1
+                if_ft.isMe = False
+        else:
+            # 跑腿
+            if_ft = FiveTaskModel.objects.get(id=fivetask_id)
+            if_ft.isMe = True
+        if_ft.save()
+        return Response({"msg": "修改成功"}, status=status.HTTP_200_OK)

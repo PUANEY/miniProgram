@@ -45,6 +45,9 @@ class LikeNumModel(models.Model):
         verbose_name = '点赞'
         verbose_name_plural = verbose_name
 
+    def __str__(self):
+        return self.post.title + self.user.username
+
 
 class PostCommentModel(models.Model):
     """

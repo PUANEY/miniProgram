@@ -10,7 +10,7 @@ class FiveTaskModel(models.Model):
     """
     丢失 拾取物品 报修 跑腿 一起运动模型
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="发布人")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="发布人", related_name="pubUser")
     category = models.CharField(max_length=60, verbose_name="类别", choices=(
         ("lost", "失物招领"),
         ("pick", "拾取"),
@@ -29,6 +29,7 @@ class FiveTaskModel(models.Model):
     isMe = models.BooleanField(verbose_name="我的任务", default=False)
     pub_time = models.DateTimeField(verbose_name="发布时间", auto_now_add=True)
     nums = models.IntegerField(verbose_name="报名人数", default=0)
+    join_users = models.ManyToManyField(User, verbose_name="报名用户", related_name="join_users", blank=True)
 
     class Meta:
         db_table = 'fivetask'
@@ -36,5 +37,5 @@ class FiveTaskModel(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return self.category + self.title
+        return self.category + '-------' + self.title
 

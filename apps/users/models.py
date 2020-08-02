@@ -17,3 +17,4 @@ class TokenVerify(models.Model):
 # 2. 提示授权，授权后可得到该微信用户的 avatar, username, gender
 # 3. 然后调用登陆接口，如果是第一次登陆则会将用户的avatar, username， gender传到后端数据库中保存。
 # 4. 以后用户信息中就有用户的id, username, avatar, gender
+

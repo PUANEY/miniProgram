@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import sys
+import datetime
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
@@ -29,6 +31,7 @@ SECRET_KEY = 's#$ta0r2z60-$3m$)-_bp%0t22y35nh!+d21gn=lsl$_=q0h+w'
 DEBUG = True
 
 ALLOWED_HOSTS = ['39.96.72.145', '127.0.0.1', '0.0.0.0:8000']
+# ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0:8000']
 AUTH_USER_MODEL = 'users.User'
 
 # Application definition
@@ -50,6 +53,8 @@ INSTALLED_APPS = [
     'search',
     'lost',
     'utils',
+    'notification',
+
 ]
 
 MIDDLEWARE = [
@@ -136,14 +141,14 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR,'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = "/media/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
-import datetime
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
