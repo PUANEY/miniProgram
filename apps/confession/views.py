@@ -25,7 +25,7 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.Gen
         url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}'.format(APP_ID, APP_KEY)
         r = requests.get(url).text
         access_token = json.loads(r)['access_token']
-        check_url = 'http://api.weixin.qq.com/wxa/servicemarket?access_token={}'.format(access_token)
+        check_url = 'https://api.weixin.qq.com/wxa/servicemarket?access_token={}'.format(access_token)
 
         user_id = request.data['user_id']
         title = request.data['title']
@@ -43,7 +43,10 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.Gen
             }
         }
         check_req = requests.post(check_url, json.dumps(check_text))
-        err_text = json.loads(json.loads(check_req.text)['data'])['Response']['EvilTokens']
+        try:
+            err_text = json.loads(json.loads(check_req.text)['data'])['Response']['EvilTokens']
+        except:
+            return Response({"msg": "内容安全检测出现故障，请联系管理员"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         if len(err_text):
             return Response({"msg": "您的内容包含敏感词汇，请重新输入!"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -83,7 +86,7 @@ class PostCommentViewSet(APIView):
         url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}'.format(APP_ID, APP_KEY)
         r = requests.get(url).text
         access_token = json.loads(r)['access_token']
-        check_url = 'http://api.weixin.qq.com/wxa/servicemarket?access_token={}'.format(access_token)
+        check_url = 'https://api.weixin.qq.com/wxa/servicemarket?access_token={}'.format(access_token)
 
         user_id = request.data['user_id']
         post_id = request.data['post_id']
@@ -113,7 +116,10 @@ class PostCommentViewSet(APIView):
             }
         }
         check_req = requests.post(check_url, json.dumps(check_text))
-        err_text = json.loads(json.loads(check_req.text)['data'])['Response']['EvilTokens']
+        try:
+            err_text = json.loads(json.loads(check_req.text)['data'])['Response']['EvilTokens']
+        except:
+            return Response({"msg": "内容安全检测出现故障，请联系管理员"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         if len(err_text):
             return Response({"msg": "您的内容包含敏感词汇，请重新输入!"}, status=status.HTTP_400_BAD_REQUEST)
 

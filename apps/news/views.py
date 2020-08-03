@@ -11,6 +11,23 @@ User = get_user_model()
 class NewsListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = NewsInfo.objects.all().order_by('-pub_time')
     serializer_class = NewsSerializers
+    # 重写get方法，加速页面加载
+
+    def list(self, request, *args, **kwargs):
+        queryset = NewsInfo.objects.all().order_by('-pub_time')
+        print(queryset)
+        news_list = []
+        data = {}
+        for qs in queryset:
+            ser = NewsSerializers(qs).data
+            data["id"] = ser.get("id")
+            data["title"] = ser.get("title")
+            data["pub_time"] = ser.get("pub_time")
+            data["image"] = ser.get("image")
+            data["tag"] = ser.get("tag")
+            news_list.append(data)
+            data = {}
+        return Response(news_list)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()

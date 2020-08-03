@@ -31,7 +31,6 @@ SECRET_KEY = 's#$ta0r2z60-$3m$)-_bp%0t22y35nh!+d21gn=lsl$_=q0h+w'
 DEBUG = True
 
 ALLOWED_HOSTS = ['39.96.72.145', '127.0.0.1', '0.0.0.0:8000']
-# ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0:8000']
 AUTH_USER_MODEL = 'users.User'
 
 # Application definition
